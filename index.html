@@ -1,0 +1,84 @@
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flower Screen Time</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; padding: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: Arial, sans-serif; color: #30243b;
+      background: linear-gradient(135deg, #fce4ec, #eee5ff, #e4f5ff);
+    }
+    .app {
+      width: 100%; max-width: 460px; padding: 26px;
+      background: white; border-radius: 24px;
+      box-shadow: 0 15px 45px #6d39841c;
+    }
+    h1 { text-align: center; color: #913bb9; }
+    h2 { font-size: 21px; }
+    p { line-height: 1.8; }
+    .small { font-size: 12px; color: #777; text-align: center; }
+    .panel {
+      background: linear-gradient(135deg, #fce7f3, #eee4ff);
+      padding: 17px; border-radius: 15px; margin: 14px 0;
+    }
+    button {
+      width: 100%; padding: 13px; margin: 8px 0;
+      border: 0; border-radius: 12px; font-size: 15px;
+      background: #913bb9; color: white; font-weight: bold; cursor: pointer;
+    }
+    button.secondary { background: #f2e5fa; color: #75339a; }
+    .hidden { display: none; }
+    .message { color: #55445f; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>🌸 Flower Screen Time</h1>
+    <p class="small">Made with ❤️ by Ankul Kumar</p>
+
+    <section id="home">
+      <h2 style="text-align:center">Choose your person ❤️</h2>
+      <div class="panel">
+        <h2>❤️ Bhai</h2>
+        <p class="message">Bhai sirf ek rishta nahi, meri zindagi ka ek khaas dost hai. Teri khushi meri khushi hai. Hamesha khush reh, mere bhai!</p>
+        <button onclick="showPage('bhai')">Bhai ❤️</button>
+      </div>
+      <div class="panel">
+        <h2>🤝 Dost</h2>
+        <p class="message">Sacchi dosti hasi, yaadon aur mushkil samay mein ek doosre ka saath dene se banti hai.</p>
+        <button class="secondary" onclick="showPage('dost')">Dost 🤝</button>
+      </div>
+    </section>
+
+    <section id="bhai" class="hidden">
+      <h2>❤️ Mere Pyare Bhai</h2>
+      <p class="message">Bhai, tu meri zindagi ka bahut khaas hissa hai. Teri khushi mere liye maayne rakhti hai. Hamesha haste rehna aur apne sapne poore karna. ❤️</p>
+      <button class="secondary" onclick="showPage('home')">← Back</button>
+    </section>
+
+    <section id="dost" class="hidden">
+      <h2>🤝 Mere Pyare Dost</h2>
+      <p class="message">Achhi dosti zindagi ko khoobsurat bana deti hai. Hamesha ek doosre ka support karna aur khoobsurat yaadein banana. Hamari dosti hamesha bani rahe! 🤝</p>
+      <button class="secondary" onclick="showPage('home')">← Back</button>
+    </section>
+  </main>
+
+  <script>
+    function showPage(page) {
+      ['home', 'bhai', 'dost'].forEach(id => {
+        document.getElementById(id).classList.toggle('hidden', id !== page);
+      });
+    }
+  </script>
+</body>
+</html>
+"""
+path = Path("/mnt/data/index.html")
+path.write_text(html, encoding="utf-8")
+print(f"Created: {path}")
