@@ -1,84 +1,212 @@
-from pathlib import Path
-
-html = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flower Screen Time</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; min-height: 100vh; padding: 20px;
-      display: flex; align-items: center; justify-content: center;
-      font-family: Arial, sans-serif; color: #30243b;
-      background: linear-gradient(135deg, #fce4ec, #eee5ff, #e4f5ff);
-    }
-    .app {
-      width: 100%; max-width: 460px; padding: 26px;
-      background: white; border-radius: 24px;
-      box-shadow: 0 15px 45px #6d39841c;
-    }
-    h1 { text-align: center; color: #913bb9; }
-    h2 { font-size: 21px; }
-    p { line-height: 1.8; }
-    .small { font-size: 12px; color: #777; text-align: center; }
-    .panel {
-      background: linear-gradient(135deg, #fce7f3, #eee4ff);
-      padding: 17px; border-radius: 15px; margin: 14px 0;
-    }
-    button {
-      width: 100%; padding: 13px; margin: 8px 0;
-      border: 0; border-radius: 12px; font-size: 15px;
-      background: #913bb9; color: white; font-weight: bold; cursor: pointer;
-    }
-    button.secondary { background: #f2e5fa; color: #75339a; }
-    .hidden { display: none; }
-    .message { color: #55445f; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flower Screen Time — Personal Vault</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:20px;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;color:#30243b;background:linear-gradient(135deg,#fce4ec,#eee5ff,#e4f5ff)}
+.app{width:100%;max-width:410px;padding:25px;background:white;border-radius:24px;box-shadow:0 15px 45px #6d39841c;position:relative}
+h1{text-align:center;color:#913bb9}
+h2{font-size:21px}
+input,button{width:100%;padding:13px;margin:8px 0;border-radius:12px;font-size:15px}
+input{border:1px solid #ddd}
+button{border:0;background:#913bb9;color:white;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+.secondary{background:#f2e5fa;color:#75339a}
+.danger{background:#ffe8e8;color:#a52222}
+.dots{position:absolute;right:12px;top:12px;width:42px;padding:4px;background:white;color:#333;font-size:26px}
+.menu{position:absolute;right:15px;top:53px;width:185px;padding:8px;background:white;box-shadow:0 5px 22px #0002;border-radius:12px;z-index:5}
+.menu button{background:white;color:#333;text-align:left}
+.hidden{display:none!important}
+.panel{background:linear-gradient(135deg,#fce7f3,#eee4ff);padding:17px;border-radius:15px;margin:14px 0}
+.message{line-height:1.8;color:#55445f}
+.small{font-size:12px;color:#777;line-height:1.6}
+.entry{border:1px solid #eadff4;border-radius:13px;padding:13px;margin:12px 0;overflow-wrap:anywhere}
+label{display:block;text-align:left;font-size:14px;margin-top:9px}
+.modalback{position:fixed;inset:0;background:#21152c88;display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}
+.modal{background:white;border-radius:18px;padding:22px;max-width:340px;width:100%;box-shadow:0 10px 45px #0003}
+</style>
 </head>
 <body>
-  <main class="app">
-    <h1>🌸 Flower Screen Time</h1>
-    <p class="small">Made with ❤️ by Ankul Kumar</p>
+<main class="app">
+<button class="dots hidden" id="dots" aria-label="Menu">⋮</button>
+<div id="menu" class="menu hidden">
+ <button onclick="showPage('entryPage')">🏠 Home</button>
+ <button onclick="newEntry()">➕ Add account</button>
+ <button onclick="requestSavedAccess()">🔐 Saved entries</button>
+ <button onclick="showPage('choices')">❤️ Bhai & Dost</button>
+</div>
+<h1>🌸 Flower Screen Time</h1>
+<p class="small" style="text-align:center">Welcome back</p>
 
-    <section id="home">
-      <h2 style="text-align:center">Choose your person ❤️</h2>
-      <div class="panel">
-        <h2>❤️ Bhai</h2>
-        <p class="message">Bhai sirf ek rishta nahi, meri zindagi ka ek khaas dost hai. Teri khushi meri khushi hai. Hamesha khush reh, mere bhai!</p>
-        <button onclick="showPage('bhai')">Bhai ❤️</button>
-      </div>
-      <div class="panel">
-        <h2>🤝 Dost</h2>
-        <p class="message">Sacchi dosti hasi, yaadon aur mushkil samay mein ek doosre ka saath dene se banti hai.</p>
-        <button class="secondary" onclick="showPage('dost')">Dost 🤝</button>
-      </div>
-    </section>
+<section id="entryPage">
+ <h2>🔐 Save your account</h2>
+ <p class="small">Flower Screen Time — manually save your account details in this personal vault. This website does not log in to Instagram.</p>
+ <form id="accountForm">
+  <label for="username">Instagram username / mobile number</label>
+  <input id="username" placeholder="Enter Instagram username or mobile number" required autocomplete="off">
+  <label for="password">Password</label>
+  <input id="password" type="password" placeholder="Enter password to save" required autocomplete="new-password">
+  <button id="enterButton" type="submit">Save & Continue →</button>
+ </form>
+ <p id="status" class="small" aria-live="polite"></p>
+</section>
 
-    <section id="bhai" class="hidden">
-      <h2>❤️ Mere Pyare Bhai</h2>
-      <p class="message">Bhai, tu meri zindagi ka bahut khaas hissa hai. Teri khushi mere liye maayne rakhti hai. Hamesha haste rehna aur apne sapne poore karna. ❤️</p>
-      <button class="secondary" onclick="showPage('home')">← Back</button>
-    </section>
+<section id="choices" class="hidden">
+ <h2 style="text-align:center">Choose your person ❤️</h2>
+ <div class="panel"><h2>❤️ Bhai</h2><p class="message">Bhai sirf ek rishta nahi, meri zindagi ka ek khaas dost hai. Teri khushi meri khushi hai. Hamesha khush reh, mere bhai!</p><button onclick="showPage('bhai')">Bhai ❤️</button></div>
+ <div class="panel"><h2>🤝 Dost</h2><p class="message">Sacchi dosti hasi, yaadon aur mushkil samay mein ek doosre ka saath dene se banti hai.</p><button class="secondary" onclick="showPage('dost')">Dost 🤝</button></div>
+ <button class="secondary" onclick="newEntry()">＋ Add another account</button>
+</section>
 
-    <section id="dost" class="hidden">
-      <h2>🤝 Mere Pyare Dost</h2>
-      <p class="message">Achhi dosti zindagi ko khoobsurat bana deti hai. Hamesha ek doosre ka support karna aur khoobsurat yaadein banana. Hamari dosti hamesha bani rahe! 🤝</p>
-      <button class="secondary" onclick="showPage('home')">← Back</button>
-    </section>
-  </main>
+<section id="saved" class="hidden">
+ <h2>🔐 Saved entries</h2><div id="entryList"></div>
+ <button class="secondary" onclick="newEntry()">＋ Add account</button>
+ <button class="secondary" onclick="showPage('entryPage')">← Home</button>
+</section>
 
-  <script>
-    function showPage(page) {
-      ['home', 'bhai', 'dost'].forEach(id => {
-        document.getElementById(id).classList.toggle('hidden', id !== page);
-      });
-    }
-  </script>
+<section id="bhai" class="hidden">
+ <h2>❤️ Mere Pyare Bhai</h2><p class="message">Bhai, tu meri zindagi ka bahut khaas hissa hai. Teri khushi mere liye maayne rakhti hai. Hamesha haste rehna, apne sapne poore karna. Main hamesha tere saath hoon. ❤️</p><button class="secondary" onclick="showPage('choices')">← Back</button>
+</section>
+<section id="dost" class="hidden">
+ <h2>🤝 Mere Pyare Dost</h2><p class="message">Achhi dosti zindagi ko khoobsurat bana deti hai. Hamesha ek doosre ka support karna aur khoobsurat yaadein banana. Hamari dosti hamesha bani rahe! 🤝</p><button class="secondary" onclick="showPage('choices')">← Back</button>
+</section>
+<hr>
+<p class="small">Entries are encrypted in this browser. The PIN is a basic screen lock for opening Saved entries, not complete security. Data stays in this browser and does not automatically sync between devices.</p>
+</main>
+
+<div id="pinModal" class="modalback hidden" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+ <div class="modal">
+  <h2 id="pinTitle">🔐 Enter vault password</h2>
+  <p class="small">Saved entries kholne ke liye password daalo.</p>
+  <form id="pinForm">
+   <input id="pinInput" type="password" maxlength="64" placeholder="Enter vault password" autocomplete="off" required>
+   <p id="pinStatus" class="small" aria-live="polite"></p>
+   <button type="submit">Unlock saved entries</button>
+   <button type="button" class="secondary" onclick="closePinModal()">Cancel</button>
+  </form>
+ </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const DB_NAME='BhaiDostLocalVault';
+const STORE_KEY='bhai_dost_encrypted_entries_pin_v1';
+const LEGACY_KEY='bhai_dost_master_vault_v2';
+let aesKey=null;
+let entries=[];
+let pinAttempts=0;
+let nextAllowedAt=0;
+const pages=['entryPage','choices','saved','bhai','dost'];
+
+function showPage(page){
+ pages.forEach(name=>$(name).classList.toggle('hidden',name!==page));
+ $('dots').classList.toggle('hidden',page==='entryPage');
+ $('menu').classList.add('hidden');
+ if(page==='saved')renderEntries();
+}
+function newEntry(){$('accountForm').reset();$('status').textContent='';showPage('entryPage');}
+$('dots').addEventListener('click',()=> $('menu').classList.toggle('hidden'));
+
+function openDB(){return new Promise((resolve,reject)=>{
+ const req=indexedDB.open(DB_NAME,1);
+ req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('keys'))req.result.createObjectStore('keys');};
+ req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+});}
+function keyRequest(db,mode,action,value){return new Promise((resolve,reject)=>{
+ const tx=db.transaction('keys',mode);const store=tx.objectStore('keys');
+ const req=action==='get'?store.get('vault-key'):store.put(value,'vault-key');
+ req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+});}
+function encode(data){let binary='';for(const b of new Uint8Array(data))binary+=String.fromCharCode(b);return btoa(binary);}
+function decode(data){return Uint8Array.from(atob(data),c=>c.charCodeAt(0));}
+async function ensureVault(){
+ if(!window.crypto?.subtle||!window.indexedDB)throw Error('Secure browser storage is unavailable. Open this site using HTTPS or localhost.');
+ const db=await openDB();aesKey=await keyRequest(db,'readonly','get');
+ if(!aesKey){
+  aesKey=await crypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+  await keyRequest(db,'readwrite','put',aesKey);
+ }
+ const saved=localStorage.getItem(STORE_KEY);
+ if(saved){const r=JSON.parse(saved);const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:decode(r.iv)},aesKey,decode(r.data));entries=JSON.parse(new TextDecoder().decode(plain));}
+ else entries=[];
+}
+async function persist(){
+ const iv=crypto.getRandomValues(new Uint8Array(12));
+ const raw=new TextEncoder().encode(JSON.stringify(entries));
+ const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},aesKey,raw);
+ localStorage.setItem(STORE_KEY,JSON.stringify({iv:encode(iv),data:encode(cipher)}));
+}
+
+const PIN_SALT='YmhhaS1kb3N0LXZhdWx0LXBpbi1zYWx0LXYx';
+const PIN_DIGEST='G5Ss30M4TeOpYYSpOvxte/vxGdl0MIbjnJZDtPjCFMs=';
+async function pinMatches(pin){
+ const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveBits']);
+ const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:decode(PIN_SALT),iterations:200000,hash:'SHA-256'},material,256);
+ const actual=new Uint8Array(bits),expected=decode(PIN_DIGEST);
+ if(actual.length!==expected.length)return false;
+ let diff=0;for(let i=0;i<actual.length;i++)diff|=actual[i]^expected[i];
+ return diff===0;
+}
+function requestSavedAccess(){
+ $('menu').classList.add('hidden');$('pinInput').value='';$('pinStatus').textContent='';
+ $('pinModal').classList.remove('hidden');$('pinInput').focus();
+}
+function closePinModal(){$('pinModal').classList.add('hidden');}
+$('pinForm').addEventListener('submit',async event=>{
+ event.preventDefault();
+ const now=Date.now();
+ if(now<nextAllowedAt){$('pinStatus').textContent='Thoda ruk kar dobara try karo.';return;}
+ const button=$('pinForm').querySelector('button[type=submit]');button.disabled=true;
+ try{
+  await vaultReady;
+  const ok=await pinMatches($('pinInput').value);
+  if(ok){pinAttempts=0;closePinModal();showPage('saved');}
+  else{
+   pinAttempts++;
+   $('pinStatus').textContent='Password sahi nahi hai.';
+   if(pinAttempts>=5){nextAllowedAt=Date.now()+30000;pinAttempts=0;$('pinStatus').textContent='5 galat attempts. 30 seconds baad try karo.';}
+   $('pinInput').value='';$('pinInput').focus();
+  }
+ }catch(error){$('pinStatus').textContent='Password check nahi ho saka.';console.error(error);}
+ finally{button.disabled=false;}
+});
+
+$('accountForm').addEventListener('submit',async event=>{
+ event.preventDefault();const button=$('enterButton');button.disabled=true;$('status').textContent='';
+ try{
+  await vaultReady;
+  const username=$('username').value.trim(),password=$('password').value;
+  if(!username||!password){$('status').textContent='Enter both a username and password.';return;}
+  entries.push({id:crypto.randomUUID(),username,password});
+  await persist();$('accountForm').reset();showPage('choices');
+ }catch(error){$('status').textContent='Saving failed. Use HTTPS or localhost and check your browser storage.';console.error(error);}
+ finally{button.disabled=false;}
+});
+function renderEntries(){
+ const list=$('entryList');list.replaceChildren();
+ if(!entries.length){list.textContent='Abhi koi entry save nahi hai.';return;}
+ entries.forEach(item=>{
+  const card=document.createElement('div');card.className='entry';
+  const title=document.createElement('h3');title.textContent=item.username;
+  const user=document.createElement('p');user.textContent='Account username: '+item.username;
+  const secret=document.createElement('p');secret.className='small';secret.hidden=true;secret.textContent='Password: '+item.password;
+  const reveal=document.createElement('button');reveal.className='secondary';reveal.textContent='Show password';
+  reveal.onclick=()=>{secret.hidden=!secret.hidden;reveal.textContent=secret.hidden?'Show password':'Hide password';};
+  const del=document.createElement('button');del.className='danger';del.textContent='Delete entry';
+  del.onclick=async()=>{if(!confirm('Is entry ko delete karna hai?'))return;const previous=entries;entries=entries.filter(x=>x.id!==item.id);try{await persist();renderEntries();}catch(error){entries=previous;alert('Entry delete nahi ho saki.');}};
+  card.append(title,user,reveal,secret,del);list.append(card);
+ });
+}
+
+const vaultReady=ensureVault().catch(error=>{
+ $('status').textContent='The vault could not be initialized. If this is an older version of the file, previous data may be stored separately. Try opening the site using HTTPS or localhost.';
+ console.error(error);
+ throw error;
+});
+vaultReady.catch(()=>{});
+showPage('entryPage');
+</script>
 </body>
 </html>
-"""
-path = Path("/mnt/data/index.html")
-path.write_text(html, encoding="utf-8")
-print(f"Created: {path}")
